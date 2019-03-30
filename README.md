@@ -2,6 +2,8 @@
 
 [![Travis](http://img.shields.io/travis/chiefbiiko/base64.svg?style=flat)](http://travis-ci.org/chiefbiiko/base64) [![AppVeyor](https://ci.appveyor.com/api/projects/status/github/chiefbiiko/base64?branch=master&svg=true)](https://ci.appveyor.com/project/chiefbiiko/base64)
 
+base64 strings from/to `Uint8Array`s
+
 ## Import
 
 ```ts
@@ -10,22 +12,20 @@ import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
 
 ## Usage
 
-Transcode base64 strings from/to typed arrays.
-
 ``` ts
 import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
 
-const b64: string = base64.fromByteArray(new TextEncoder().encode("this is too much"));
-const buf: Uint8Array = base64.toByteArray(b64);
+const b64: string = base64.fromUint8Array(new TextEncoder().encode("this is too much"));
+const buf: Uint8Array = base64.toUint8Array(b64);
 ```
 
 ## API
 
-### `base64.fromByteArray(buf: Uint8Array): string`
+### `base64.fromUint8Array(buf: Uint8Array): string`
 
-Encode a base64 string from a byte array.
+Transcode a base64 string from a byte array.
 
-### `base64.toByteArray(b64: string): Uint8Array`
+### `base64.toUint8Array(b64: string): Uint8Array`
 
 Turn a base64 string to a byte array.
 

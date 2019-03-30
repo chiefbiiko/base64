@@ -6,19 +6,19 @@ const enc: TextEncoder = new TextEncoder();
 const dec: TextDecoder = new TextDecoder();
 
 test(function base64WannabeBigData(): void {
-  const big: Uint8Array = new Uint8Array(1 * 1024 * 1024);
+  const big: Uint8Array = new Uint8Array(13 * 1024 * 1024);
   for (let i: number = 0, l = big.length; i < l; ++i) {
     big[i] = i % 256;
   }
-  const b64: string = base64.fromByteArray(big);
-  const buf: Uint8Array = base64.toByteArray(b64);
+  const b64: string = base64.fromUint8Array(big);
+  const buf: Uint8Array = base64.toUint8Array(b64);
   assertEquals(buf, big);
   assertEquals(base64.byteLength(b64), buf.length);
 });
 
 test(function base64HandlesIrregularPadding(): void {
   const b64: string = "SQ==QU0=";
-  assertEquals(base64.toByteArray(b64), Uint8Array.from([73]));
+  assertEquals(base64.toUint8Array(b64), Uint8Array.from([73]));
   assertEquals(base64.byteLength(b64), 1);
 });
 
@@ -35,7 +35,7 @@ test(function base64DecodeUrlSafe(): void {
     0xff
   ]);
   for (const b64 of ["//++/++/++//", "__--_--_--__"]) {
-    const actual: Uint8Array = base64.toByteArray(b64);
+    const actual: Uint8Array = base64.toUint8Array(b64);
     assertEquals(actual, expected);
     assertEquals(base64.byteLength(b64), actual.length);
   }
@@ -54,8 +54,8 @@ test(function base64RoundTrip(): void {
     "sup?!"
   ];
   for (const check of checks) {
-    const b64: string = base64.fromByteArray(enc.encode(check));
-    const buf: Uint8Array = base64.toByteArray(b64);
+    const b64: string = base64.fromUint8Array(enc.encode(check));
+    const buf: Uint8Array = base64.toUint8Array(b64);
     assertEquals(check, dec.decode(buf));
     assertEquals(base64.byteLength(b64), buf.length);
   }
@@ -72,8 +72,9 @@ test(function base64Identity(): void {
     [Uint8Array.from([0, -73, 23]), "ALcX"]
   ];
   for (const [buf, b64] of data) {
-    assertEquals(base64.fromByteArray(buf), b64);
-    assertEquals(base64.toByteArray(b64), buf);
+    assertEquals(base64.fromUint8Array(buf), b64);
+    assertEquals(base64.toUint8Array(b64), buf);
+    assertEquals(base64.byteLength(b64), buf.length);
   }
 });
 

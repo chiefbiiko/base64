@@ -35,7 +35,7 @@ function _byteLength(validLen: number, placeHoldersLen: number): number {
   return ((validLen + placeHoldersLen) * 3) / 4 - placeHoldersLen;
 }
 
-export function toByteArray(b64: string): Uint8Array {
+export function toUint8Array(b64: string): Uint8Array {
   let tmp: number;
   const [validLen, placeHoldersLen]: number[] = getLens(b64);
   const buf = new Uint8Array(_byteLength(validLen, placeHoldersLen));
@@ -88,7 +88,7 @@ function encodeChunk(buf: Uint8Array, start: number, end: number): string {
   return out.join("");
 }
 
-export function fromByteArray(buf: Uint8Array): string {
+export function fromUint8Array(buf: Uint8Array): string {
   let tmp: number;
   const maxChunkLength: number = 16383; // Must be multiple of 3
   const len: number = buf.length;
