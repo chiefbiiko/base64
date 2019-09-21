@@ -19,6 +19,8 @@ const b64: string = base64.fromUint8Array(new TextEncoder().encode("this is too 
 const buf: Uint8Array = base64.toUint8Array(b64);
 ```
 
+If you need a URL and file name safe base64 variant `import * as base64url from "https://denopkg.com/chiefbiiko/base64/base64url.ts";`
+
 ## API
 
 ### `base64.fromUint8Array(buf: Uint8Array): string`
