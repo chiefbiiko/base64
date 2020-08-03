@@ -1,9 +1,9 @@
 function getLengths(b64: string): [number, number] {
   const len: number = b64.length;
 
-  if (len % 4 > 0) {
-    throw new TypeError("Invalid string. Length must be a multiple of 4");
-  }
+  // if (len % 4 > 0) {
+  //   throw new TypeError("Invalid string. Length must be a multiple of 4");
+  // }
 
   // Trim off extra bytes after placeholder bytes are found
   // See: https://github.com/beatgammit/base64-js/issues/42
@@ -18,9 +18,13 @@ function getLengths(b64: string): [number, number] {
   return [validLen, placeHoldersLen];
 }
 
-export function init(lookup: string[], revLookup: number[]) {
+export function init(
+  lookup: string[],
+  revLookup: number[],
+  urlsafe: boolean = false,
+) {
   function _byteLength(validLen: number, placeHoldersLen: number): number {
-    return ((validLen + placeHoldersLen) * 3) / 4 - placeHoldersLen;
+    return Math.floor(((validLen + placeHoldersLen) * 3) / 4 - placeHoldersLen);
   }
 
   function tripletToBase64(num: number): string {
@@ -37,7 +41,7 @@ export function init(lookup: string[], revLookup: number[]) {
 
     for (let i: number = start, curTriplet: number = 0; i < end; i += 3) {
       out[curTriplet++] = tripletToBase64(
-        (buf[i] << 16) + (buf[i + 1] << 8) + buf[i + 2]
+        (buf[i] << 16) + (buf[i + 1] << 8) + buf[i + 2],
       );
     }
 
@@ -62,8 +66,7 @@ export function init(lookup: string[], revLookup: number[]) {
       let i: number;
 
       for (i = 0; i < len; i += 4) {
-        tmp =
-          (revLookup[b64.charCodeAt(i)] << 18) |
+        tmp = (revLookup[b64.charCodeAt(i)] << 18) |
           (revLookup[b64.charCodeAt(i + 1)] << 12) |
           (revLookup[b64.charCodeAt(i + 2)] << 6) |
           revLookup[b64.charCodeAt(i + 3)];
@@ -73,13 +76,11 @@ export function init(lookup: string[], revLookup: number[]) {
       }
 
       if (placeHoldersLen === 2) {
-        tmp =
-          (revLookup[b64.charCodeAt(i)] << 2) |
+        tmp = (revLookup[b64.charCodeAt(i)] << 2) |
           (revLookup[b64.charCodeAt(i + 1)] >> 4);
         buf[curByte++] = tmp & 0xff;
       } else if (placeHoldersLen === 1) {
-        tmp =
-          (revLookup[b64.charCodeAt(i)] << 10) |
+        tmp = (revLookup[b64.charCodeAt(i)] << 10) |
           (revLookup[b64.charCodeAt(i + 1)] << 4) |
           (revLookup[b64.charCodeAt(i + 2)] >> 2);
         buf[curByte++] = (tmp >> 8) & 0xff;
@@ -98,7 +99,7 @@ export function init(lookup: string[], revLookup: number[]) {
       const len2: number = len - extraBytes;
 
       const parts: string[] = new Array(
-        Math.ceil(len2 / maxChunkLength) + (extraBytes ? 1 : 0)
+        Math.ceil(len2 / maxChunkLength) + (extraBytes ? 1 : 0),
       );
 
       let curChunk: number = 0;
@@ -110,7 +111,7 @@ export function init(lookup: string[], revLookup: number[]) {
         parts[curChunk++] = encodeChunk(
           buf,
           i,
-          chunkEnd > len2 ? len2 : chunkEnd
+          chunkEnd > len2 ? len2 : chunkEnd,
         );
       }
 
@@ -119,17 +120,17 @@ export function init(lookup: string[], revLookup: number[]) {
       // Pad the end with zeros, but make sure to not forget the extra bytes
       if (extraBytes === 1) {
         tmp = buf[len2];
-        parts[curChunk] = lookup[tmp >> 2] + lookup[(tmp << 4) & 0x3f] + "==";
+        parts[curChunk] = lookup[tmp >> 2] + lookup[(tmp << 4) & 0x3f];
+        if (!urlsafe) parts[curChunk] += "==";
       } else if (extraBytes === 2) {
         tmp = (buf[len2] << 8) | (buf[len2 + 1] & 0xff);
-        parts[curChunk] =
-          lookup[tmp >> 10] +
+        parts[curChunk] = lookup[tmp >> 10] +
           lookup[(tmp >> 4) & 0x3f] +
-          lookup[(tmp << 2) & 0x3f] +
-          "=";
+          lookup[(tmp << 2) & 0x3f];
+        if (!urlsafe) parts[curChunk] += "=";
       }
 
       return parts.join("");
-    }
+    },
   };
 }
