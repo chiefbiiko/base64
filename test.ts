@@ -1,7 +1,4 @@
-import {
-  assertEquals,
-  assertThrows,
-} from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 import * as base64 from "./mod.ts";
 import * as base64url from "./base64url.ts";
 
@@ -146,5 +143,20 @@ Deno.test({
       assertEquals(base64.toUint8Array(b64), buf);
       assertEquals(base64.byteLength(b64), buf.length);
     }
+  },
+});
+
+Deno.test({
+  name: "base64url encoding handles trailing equal signs",
+  fn(): void {
+    const buf1: Uint8Array = base64.toUint8Array(
+      "zet6fDtBuK4WVuP68Z_EatoJjeucMrH9hmIFFl9JuIA=",
+    );
+
+    const buf2: Uint8Array = base64url.toUint8Array(
+      "zet6fDtBuK4WVuP68Z_EatoJjeucMrH9hmIFFl9JuIA=",
+    );
+
+    assertEquals(buf1, buf2);
   },
 });
